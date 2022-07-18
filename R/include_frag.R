@@ -1,3 +1,5 @@
+#' Take docx file convert to markdown and include as child
+#' @export include_frag
 include_frag <- function(my_file) {
   input <- here::here(my_file)
 
