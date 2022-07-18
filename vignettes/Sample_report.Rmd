@@ -1,0 +1,312 @@
+---
+title: "Sample report"
+subtitle: "You can have a subtitle too"
+author: [Simon Knight]
+date: "`r Sys.Date()`"
+github-repo: sjgknight/rureporting
+site: "bookdown::bookdown_site"
+book_filename: "Sample_report"
+biblio-style: apalike
+split_bib: no
+nocite: '@*'
+bibliography: ["book.bib", "packages.bib"]
+link-citations: yes
+description: "You can add a description here"
+sharing: no
+vignette: >
+  %\VignetteIndexEntry{Sample_report}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+output:
+  rmarkdown::html_document:
+    repo: https://github.com/sjgknight/rureporting
+    sharing: no
+    download: ["pdf", "epub"]
+  bookdown::pdf_book:
+    includes:
+      in_header: "preamble.tex"
+      before_body: "before_body.tex"
+    book_filename: "sample_report"
+    fig_caption: yes
+    css: "style.css"
+    output_dir: "_book/pdf/"
+    keep_tex: true
+    latex_engine: xelatex
+    titlepage: true
+    titlepage-color: 0d41d1
+    titlepage-text-color: f5f4f5
+    titlepage-rule-color: f5f4f5
+    titlepage-rule-height: 1
+    language:
+      ui:
+        chapter_name: "Part "
+header-includes:
+  - \usepackage{xcolor}
+  - \usepackage{titling}
+  - \usepackage{pdfpages}
+  - \usepackage{fancyhdr}
+  - \usepackage{floatrow}
+  - \usepackage{caption}
+  - \definecolor{bluerich}{RGB}{13,65,209}
+  - \usepackage{titling}
+  - \pretitle{\begin{center}
+  - \floatsetup[figure]{capposition=top}
+  - \includegraphics[width=2in,height=2in]{extdata/logo.png}\LARGE\\}
+  - \posttitle{\end{center}}
+  - \setlength{\headheight}{23pt}
+  - \addtolength{\topmargin}{-11pt}
+  - \fancyfoot[L]{\footnotesize\textcolor{bluerich}{\textbf{University of My Institution} \\ Centre for Stuff I Do (CSID) \\ Institute for Collaborator Place (ICP) \\ Department }}
+  - \fancyfoot[C]{\thepage}
+  - \renewcommand{\footrulewidth}{2pt}
+  - \fancyhead[L]{\itshape\nouppercase{\rightmark}}
+  - \fancyhead[R]{Section \arabic{chapter}}
+  - \pagestyle{fancy}
+documentclass: book
+---
+
+```{r setup}
+library(rureporting)
+```
+
+# Working with this document
+
+This report was written as a wrapper site to compile a set of outputs, along with their rationale and the overarching narrative. It was written using a tool called *bookdown*, with the aim to make it easier to navigate the materials without getting lost (and to support export to other formats like PDF). 
+
+This document gives a brief overview of the approach and functions. Essentially it:
+
+1. Takes a set of .docx or .pptx documents and converts them to PDF
+1. Creates two report versions, a bs4 website with embedded documents, and a compiled PDF that incorporates all the embedded docs.
+
+This means that:
+
+* People can work in word/powerpoint, etc. as usual, so they don't need to learn any new tools
+* The documents can remain disaggregated, so they can be worked on separately, and maintained that way, with updates to the compilation drawing on the most recent version
+* The documents can be browsed disaggregated, without getting lost in the detail of the individual components
+
+
+
+```{r create-bib, include=FALSE}
+#, eval=params$bibupdate
+# automatically create a bib database for R packages
+#knitr::write_bib(.packages(), "packages.bib", tweak = TRUE) 
+
+#extracted references from word docs using https://rintze.zelle.me/ref-extractor/ 
+
+#collection <- "http://127.0.0.1:23119/better-bibtex/export/collection?/2743773/9Q2H88RP.bibtex"
+#http://127.0.0.1:23119/better-bibtex/export/collection?/2743773/all_used.bibtex
+#download.file(collection,"book.bib")
+
+#curl::curl_download(collection,"book.bib")
+
+```
+
+```{r load-things, include=FALSE}
+#bookdown::render_book('index.Rmd', 'all')
+
+xfun::pkg_load2(c("htmltools", "mime"))
+```
+
+```{r set-global-knit, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, out.width = "75%", warnings=F, message=F)
+
+#this one is particularly to hide knitting messages that end up when we include the html fragments. I believe adding quiet = TRUE to render may also work 
+knitr::opts_knit$set(progress=FALSE, verbose=FALSE)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+```
+
+## Basic structure 
+
+The basic structure follows the `bookdown` template. Once you've copied the bookdown template, create a 'data' directory, and subdirectories in that for your components. 
+
+I faffed around trying to create a cover page with latex, and ended up just using a Word version and includepdf. 
+
+## Examples of functions
+
+### include_doc 
+
+Include doc will:
+
+1. Check if the file is already a pdf extension. If TRUE, then it'll either embed (bs4) or includepdf (pdf).
+1. If FALSE, then convert to PDF, and same. 
+1. In the PDF version, it'll take the chunk name and apply it to the included PDF as a label, this allows the cross-referencing to work, for example \@ref(fig:include_doc_example) should link to the next chunk
+
+```{r include_doc_example, fig.cap="Example of embedding a doc"}
+# just show it for pdf sample
+
+sampledoc <- system.file("extdata", "sample_doc.pdf", package = "rureporting")
+
+include_doc(sampledoc)
+
+```
+
+### include_frag
+
+Function include_frag will:
+
+1. Convert docx files to markdown
+1. Include the markdown as a child document
+
+Mileage may vary depending on complexity of document, etc. (I found it useful for a couple of simple things)
+
+** Note - include_frag chunks must use the `results='asis'` option **
+
+```{r include_frag_example, fig.cap="Frag include example", results='asis'}
+
+samplefrag <- system.file("extdata", "sample_frag.docx", package = "rureporting")
+
+include_frag(samplefrag)
+
+```
+
+## For other inspiration explore
+
+* https://github.com/ismayc/thesisdown_book/
+* https://github.com/UTS-CAS/UTS-CAS_thesis_template
+* https://masiraji.github.io/monashthesisdown/
+* https://cran.r-project.org/web/packages/reporter/index.html
+* https://numbats.github.io/monash/
+* https://ehyaei.github.io/MPIThemes/articles/articles/01_pdf_report_template_customization.html
+* https://ulriklyngs.com/post/2021/12/02/how-to-adapt-any-latex-template-for-use-with-r-markdown-in-four-steps/
+* https://cran.r-project.org/web/packages/memoiR/vignettes/memoiR.html
+
+
+## Things to explore later (or, junk code)
+
+<!--
+
+      in_header: `'r system.file("extdata/preamble.tex", package="mypackage")`'`
+      before_body: `'r system.file("extdata/before_body.tex", package="mypackage")`'`
+      
+      
+# I added this param with the idea to create a conditional update of the bibliography...it does not work.
+params:
+  bibupdate:
+    label: "Update bibliography (true to update, false to skip)"
+    value: FALSE
+    input: radio
+    choices: [TRUE,FALSE]
+
+    header:
+      includes:
+        in_header: "preamble.tex"
+
+
+`r if (knitr:::is_latex_output()) {
+
+}  # References used {-} `
+
+    knitr::raw_latex()
+
+r if (knitr:::is_html_output())  # References used {-} 
+
+
+
+  - \usepackage[style=apa, backend=biber]{biblatex}
+
+  bookdown::pdf_book:
+    fig_caption: yes
+    base_format: bookdown::pdf_document2
+    css: "style.css"
+    keep_tex: true
+    latex_engine: xelatex
+    titlepage: true
+    titlepage-color: 0d41d1
+    titlepage-text-color: f5f4f5
+    titlepage-rule-color: f5f4f5
+    titlepage-rule-height: 1
+    highlight: tango
+    output_dir: "unmerged_book"
+    
+    -->
+
+<!-- everything below here can be ignored for authors, it just loads some code/sets some options -->
+
+<!-- 
+  bookdown::gitbook:
+    output_dir: "_book/gitbook"
+    lib_dir: assets
+    split_by: section
+    repo: https://github.com/sjgknight/iyarn
+    download: ["pdf", "epub"]
+    css: "style.css"
+    config:
+      toolbar:
+        sharing: no
+
+
+
+  - \fancyfoot[R]{"Knight, S., Potts, M., Mills, C., Lee, P. (2022). iyarn: Developing the Evidence Base – Final Project Report. University of Technology Sydney."}
+  - \newcommand{\helv}{%\fontfamily{phv}\fontseries{b}\fontsize{9}{11}\selectfont}
+
+  - \usepackage[usenames,dvipsnames]{xcolor}
+  - \definecolor{bluerich}{rgb}{13,65,209}
+  
+    - \fancyfoot[L]{\textcolor{bluerich}{\textbf{University of Technology Sydney} \\ Centre for Research on Education in a Digital Society (CREDS) \\ Institute for Public Policy and Governance (IPPG) \\TD School}}
+
+    - \fancyfoot[L]{\textcolor{bluerich}{\textbf}{University of Technology Sydney} \\ Centre for Research on Education in a Digital Society (CREDS) \\ Institute for Public Policy and Governance (IPPG) \\TD School}
+
+  - \newenvironment{headfoot}{\textcolor}{bluerich}
+  - \begin{headfoot}
+  
+    - \let\oldfootrule\fancyfoot% Copy \fancyfoot into \oldfootrule
+  - \renewcommand{\fancyfoot}{\color{bluerich}\oldfootrule}% Add colour to \fancyfoot
+-->
+
+```{r set-css, eval=FALSE, include=FALSE}
+pacman::p_load(npm)
+npm_install("chroma-sass", scope="dev")
+pacman::p_load_gh("ehyaei/MPIThemes")
+```
+
+
+```{r eval=FALSE, include=FALSE}
+install.packages("bookdown")
+# or the development version
+# devtools::install_github("rstudio/bookdown")
+ 
+# Remember each Rmd file contains one and only one chapter, and a chapter is defined by the first-level heading `#`.
+
+# To compile this example to PDF, you need XeLaTeX. You are recommended to install TinyTeX (which includes XeLaTeX): <https://yihui.name/tinytex/>.
+
+#unlink("index_cache", recursive = TRUE) - is very usefl
+#bookdown::serve_book()
+#bookdown::render_book('index.Rmd', 'all')
+
+```
+
+<!-- Add anchors to # headings using `{#label}` after them, e.g., we can reference Chapter \@ref(intro). 
+
+Reference a figure by its code chunk label with the `fig:` prefix, e.g., see Figure \@ref(fig:nice-fig). Similarly, you can reference tables generated from `knitr::kable()`, e.g., see Table \@ref(tab:nice-tab).
+
+```{r nice-fig, fig.cap='Here is a nice figure!', out.width='80%', fig.asp=.75, fig.align='center'}
+par(mar = c(4, 4, .1, .1))
+plot(pressure, type = 'b', pch = 19)
+```
+ 
+You can write citations, too. For example, we are using the **bookdown** package [@R-bookdown] in this sample book, which was built on top of R Markdown and **knitr** [@xie2015].
+ -->
+
+```{r eval=FALSE, include=FALSE}
+#at some point maybe explore these
+
+library(officer)
+library(magrittr)
+
+doc_2 <- read_docx(path = "../report_draft.docx") %>% 
+  body_add_par("Hello world!", style = "Normal") 
+
+pptx_2 <- read_pptx(path = "../Attachments/evidence-base.pptx") 
+doc_2 <- 
+  
+  body_add_docx
+
+
+print(doc_2, target = "example_2.docx")
+
+```

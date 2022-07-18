@@ -1,0 +1,14 @@
+citHeader("To cite rureporting in publications use:")
+
+citEntry(entry = "Article",
+  title        = "Compiling docs for modern reporting with {rureporting}",
+  journal      = "n/a"
+  author       = personList(as.person("Simon Knight")),
+  year         = "2022",
+  url          = "https://www.github.com/sjgknight/rureporting/",
+
+  textVersion  =
+  paste("Knight, Simon (2022).",
+        "Compiling docs for modern reporting with rureporting",
+        "URL https://www.github.com/sjgknight/rureporting/.")
+)
