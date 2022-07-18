@@ -1,0 +1,91 @@
+---
+title: "introduction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rureporting)
+```
+
+# Mapping iyarn's theory of change through a feature:output matrix {#model}
+
+```{r ToC-background, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+input <- "data/03-model/03_Theory_of_change.docx"
+
+include_frag(input)
+
+
+```
+
+
+```{r set-global-knit, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, out.width = "75%", warnings=F, message=F)
+
+#this one is particularly to hide knitting messages that end up when we include the html fragments. I believe adding quiet = TRUE to render may also work 
+knitr::opts_knit$set(progress=FALSE, verbose=FALSE)
+
+```
+
+
+
+
+<!-- Add anchors to # headings using `{#label}` after them, e.g., we can reference Chapter \@ref(intro). 
+
+Reference a figure by its code chunk label with the `fig:` prefix, e.g., see Figure \@ref(fig:nice-fig). Similarly, you can reference tables generated from `knitr::kable()`, e.g., see Table \@ref(tab:nice-tab).
+
+```{r nice-fig, fig.cap='Here is a nice figure!', out.width='80%', fig.asp=.75, fig.align='center'}
+par(mar = c(4, 4, .1, .1))
+plot(pressure, type = 'b', pch = 19)
+```
+ 
+You can write citations, too. For example, we are using the **bookdown** package [@R-bookdown] in this sample book, which was built on top of R Markdown and **knitr** [@xie2015].
+ -->
+
+```{r eval=FALSE, include=FALSE}
+#at some point maybe explore these
+
+library(officer)
+library(magrittr)
+
+doc_2 <- read_docx(path = "../report_draft.docx") %>% 
+  body_add_par("Hello world!", style = "Normal") 
+
+pptx_2 <- read_pptx(path = "../Attachments/evidence-base.pptx") 
+doc_2 <- 
+  
+  body_add_docx
+
+
+print(doc_2, target = "example_2.docx")
+
+```
+
+
+
+```{r create-bib, include=FALSE, eval=params$bibupdate}
+
+# automatically create a bib database for R packages
+knitr::write_bib(.packages(), "packages.bib", tweak = TRUE) 
+
+#extracted references from word docs using https://rintze.zelle.me/ref-extractor/ 
+
+collection <- "http://127.0.0.1:23119/better-bibtex/export/collection?/2743773/9Q2H88RP.bibtex"
+#http://127.0.0.1:23119/better-bibtex/export/collection?/2743773/all_used.bibtex
+#download.file(collection,"book.bib")
+
+#curl::curl_download(collection,"book.bib")
+
+```
