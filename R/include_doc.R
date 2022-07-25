@@ -33,7 +33,7 @@ include_doc <- function(my_file,title=paste0(my_file),is_embed=TRUE) {
 
   ##only create the PDF if the base file has been updated more recently
   input_mod <- fs::file_info(input)$modification_time
-  output_mod <- if(file.exists(gsub("\\.(docx|pptx)$", ".pdf", input)) {
+  output_mod <- if(file.exists(gsub("\\.(docx|pptx)$", ".pdf", input))) {
     fs::file_info(gsub("\\.(docx|pptx)$", ".pdf", input))$modification_time
   } else {
     paste0(0)
