@@ -36,7 +36,7 @@ include_doc <- function(my_file,title=paste0(my_file),is_embed=TRUE) {
   output_mod <- if(file.exists(gsub("\\.(docx|pptx)$", ".pdf", input))) {
     fs::file_info(gsub("\\.(docx|pptx)$", ".pdf", input))$modification_time
   } else {
-    paste0(0)
+    input_mod - 1
     }
 
 
